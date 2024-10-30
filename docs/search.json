@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Zheng Ren",
+    "section": "",
+    "text": "Profile Photo\n\n\nI’m a first-year PhD student in Biostatistics with a background in finance and data science, and an interest in neuroimaging and wearable devices. In my free time, I enjoy playing the piano, hiking, and playing badminton."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Education\n\n\nBrandeis University\nBachelor of Arts in Business and Economics\nUniversity of Pennsylvania\nMaster of Science in Data Analytics and Policy\nJohns Hopkins University\nPhD in Biostatistics\n\n\n\nSelf-introduction\n\nHello! I’m Zheng Ren, a first-year PhD student in Biostatistics. My academic journey began with an undergraduate degree in Business and Economics from Brandeis University, followed by a master’s degree in Social Policy and Data Analytics from the University of Pennsylvania. My professional background includes a six-month internship with the United Nations and two years of experience as a full-time data analyst at Penn’s Statistics in Imaging and Visualization Endeavor (PennSIVE).\nDuring my internship at the UN, I saw firsthand how data science can play a transformative role in the health sector. We developed interactive COVID-19 dashboards to monitor disease spread and vaccine availability worldwide. This experience inspired me to apply my advanced data science skills to health-related fields. My two years of research at PennSIVE deepened my passion for neuroimaging and wearable devices. I’m particularly interested in using data science and statistical methods to analyze emerging data types, such as imaging and functional data. I also aim to contribute to user-friendly software development, making innovative methods accessible to people from diverse backgrounds."
+  },
+  {
+    "objectID": "alternative.html",
+    "href": "alternative.html",
+    "title": "Example Analysis",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)\nlibrary(ggplot2)\nlibrary(lme4)\nlibrary(ggcorrplot)\nlibrary(geepack)\n\nchange_rate = function(sbj){\n  sbj_df = df[df$Subject_ID == sbj, c(\"Subject_ID\", \"Age\", \"nWBV\")]\n  sbj_df_n = sbj_df %>% group_by(Age) %>% summarize(nWBV = mean(nWBV))\n  sbj_df_n$Subject_ID = rep(sbj, nrow(sbj_df_n))\n  sbj_df = sbj_df_n\n  sbj_df = sbj_df %>% mutate(age_post = lead(Age),\n                             nwbv_post = lead(nWBV),\n                             change_rate = 100*(nwbv_post - nWBV)/(age_post - Age))\n  return(sbj_df %>% na.omit() %>% pull(change_rate) %>% mean())\n}"
+  },
+  {
+    "objectID": "alternative.html#agesocial-status-v.s.-dementia-status",
+    "href": "alternative.html#agesocial-status-v.s.-dementia-status",
+    "title": "Example Analysis",
+    "section": "4.1 Age/Social Status v.s. Dementia Status",
+    "text": "4.1 Age/Social Status v.s. Dementia Status\n\nAgeSocial Status\n\n\n\n\nCode\nggplot(df_uni, aes(x = age_group, fill = AD)) +\n  geom_bar() +  \n  facet_wrap(~AD) +\n  scale_fill_brewer(palette = \"Paired\") +  # Use a ColorBrewer palette, e.g., \"Set3\", \"Paired\", \"Dark2\"\n  theme_light() +\n  labs(x = \"Age Group\", y = \"Count\", fill = \"AD Status\")\n\n\n\n\n\nFigure 2: Patient age distribution.\n\n\n\n\n\n\n\n\nCode\nggplot(df_uni %>% na.omit(), aes(x = SES, fill = AD)) +\n  geom_bar() +  \n  facet_wrap(~AD) +\n  scale_fill_brewer(palette = \"Paired\") +  # Use a ColorBrewer palette, e.g., \"Set3\", \"Paired\", \"Dark2\"\n  theme_light() +\n  labs(x = \"Social Status Group\", y = \"Count\", fill = \"AD Status\")\n\n\n\n\n\nFigure 3: Patient social status distribution."
+  },
+  {
+    "objectID": "alternative.html#brian-volumn-distribution",
+    "href": "alternative.html#brian-volumn-distribution",
+    "title": "Example Analysis",
+    "section": "4.2 Brian Volumn Distribution",
+    "text": "4.2 Brian Volumn Distribution\nLooking into the whole-brain volumn distribution in different CDR group, the whole-brain volumn seems to be lower in mild and moderate AD group (CDR equals 1 and 2) comparing to Normal people (CDR equals 0). Similar conclusion can be drawn comparing normal group people with demented people, the whole-brain volumn seems to be lower in demented people. To be noticed, there seems to be a slice of difference in male and female group. Females seem to have slightly higher whole-brain volumn than males in both normal and demented group of people. A shinkage of whole brain volumn in demented males seems to be more easily observed than females.\n\n\nCode\ndf$CDR = as.factor(df$CDR)\nggplot(df, aes(x = CDR, y = nWBV, fill = CDR)) +  # Put fill inside aes() to map colors by CDR\n  geom_boxplot() +  \n  scale_fill_brewer(palette = \"Set3\") +  # Use ColorBrewer palette\n  theme_light() +\n  labs(x = \"CDR\", y = \"nWBV\") +\n  theme(legend.position = \"none\")\n\n\n\n\n\nFigure 4: Whole-brain volumn distribution in different CDR group.\n\n\n\n\n\n\nCode\nggplot(df_uni, aes(x = AD, y = nWBV, fill = AD)) +  # Put fill inside aes() to map colors by CDR\n  geom_boxplot() +  \n  scale_fill_brewer(palette = \"Paired\") +  \n  theme_light() +\n  labs(x = \"AD status\", y = \"nWBV\") +\n  theme(legend.position = \"none\")\n\nggplot(df_uni, aes(x = AD, y = nWBV, fill = Sex)) +  \n  geom_violin(trim = FALSE, alpha = 0.7) +  # Add transparency for overlap\n  scale_fill_brewer(palette = \"Paired\") +  \n  theme_light(base_size = 14) +  # Set a larger base font size\n  labs(x = \"AD Status\", y = \"nWBV\", fill = \"Sex\") +\n  theme(\n    panel.grid.minor = element_blank(),  # Remove minor gridlines for a cleaner look\n    panel.grid.major = element_line(color = \"gray90\"),\n    legend.position = \"top\"  # Move legend to the top for better space usage\n  )\n\n\n\n\n\n\n\nFigure 5: AD status vs nWBV\n\n\n\n\n\n\n\nFigure 6: AD status vs nWBV in different sex group"
+  },
+  {
+    "objectID": "alternative.html#mmse-distribution",
+    "href": "alternative.html#mmse-distribution",
+    "title": "Example Analysis",
+    "section": "4.3 MMSE Distribution",
+    "text": "4.3 MMSE Distribution\nDemented group of people seems to have much lower MMSE scores and the variance of MMSE scores is also greater than normal people. There seems no clear pattern showing any association of age and MMSE scores, except for extremely low MMSE score in 60-70 age group (might be outliers).\n\n\nCode\nggplot(df_uni, aes(x = Age, y = MMSE, color = AD)) +  # Put fill inside aes() to map colors by CDR\n  geom_point() +  \n  scale_fill_brewer(palette = \"Paired\") +  \n  theme_light() +\n  labs(x = \"Age\", y = \"MMSE\") +\n  theme(legend.position = \"none\")\n\nggplot(df_uni, aes(x = AD, y = MMSE, fill = AD)) +  # Put fill inside aes() to map colors by CDR\n  geom_boxplot() +  \n  scale_fill_brewer(palette = \"Paired\") +  \n  theme_light() +\n  labs(x = \"AD status\", y = \"MMSE\") +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\nFigure 7: Age vs MMSE\n\n\n\n\n\n\n\nFigure 8: AD status vs MMSE"
+  },
+  {
+    "objectID": "alternative.html#attributes-correlation",
+    "href": "alternative.html#attributes-correlation",
+    "title": "Example Analysis",
+    "section": "4.4 Attributes’ correlation",
+    "text": "4.4 Attributes’ correlation\nIt is always significant to check all attributes’ correlation before include them in any models. It seems that eTIV and ASF, SES and EDUC, CDR and MMSE, MR_Delay and Visit have high correlations. Due to the high correlation between SES and EDUC, we include EDUC in our models as a covariate, since SES has more missing values.\n\n\nCode\ndf$Sex = ifelse(df$Sex == \"M\", 1, 0)\n\n# Select the relevant columns and compute the correlation matrix\ncor_matrix = df %>% na.omit() %>% dplyr::select(Visit, MR_Delay, Sex, Age, EDUC, SES, MMSE, CDR, eTIV, nWBV, ASF) %>% mutate_all(as.numeric) %>% as.matrix() %>% cor()\n\n# Plot the heatmap with ggcorrplot\nggcorrplot(cor_matrix, \n           hc.order = TRUE,      \n           type = \"lower\",       \n           lab = TRUE,           \n           lab_size = 3,         \n           colors = c(\"blue\", \"white\", \"red\"), \n           ggtheme = theme_minimal())\n\n\n\n\n\nFigure 9: Correlation heatmap."
+  },
+  {
+    "objectID": "alternative.html#welchs-t-test",
+    "href": "alternative.html#welchs-t-test",
+    "title": "Example Analysis",
+    "section": "6.1 Welch’s t-test",
+    "text": "6.1 Welch’s t-test\nThe decreasing rates of whole-brain volumn in demented group of people and normal people seem both to be normally distributed but with different variance. Therefore, we use Welch’s t-test to test whether decreasing rates are significantly different in two groups of people. Based on the test result, decreasing rates seem to be significantly different in two groups of people.\n\n\nCode\ndf_uni$nWBV_change_rate = sapply(df_uni$Subject_ID, function(x) change_rate(x), USE.NAMES = FALSE)\nggplot(df_uni, aes(x = AD, y = nWBV_change_rate, fill = AD)) +  \n  geom_boxplot() +  \n  scale_fill_brewer(palette = \"Set3\") +  \n  theme_light() +\n  labs(x = \"Group\", y = \"Decrease rate of brain volumn\") +\n  theme(legend.position = \"none\")\n\nggplot(df_uni, aes(x = nWBV_change_rate, fill = AD, alpha = 0.3)) +  \n  geom_density() +  \n  scale_fill_brewer(palette = \"Set3\") +  \n  theme_light() +\n  labs(x = \"Decrease rate of brain volumn\", y = \"Density\") +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\nFigure 10: Decrease rate of brain volumn between AD groups\n\n\n\n\n\n\n\nFigure 11: Decrease rate of brain volumn distribution\n\n\n\n\n\n\n\n\nCode\n# Welch’s t-test\nsample1 = df_uni[which(df_uni$AD_status == 1),]$nWBV_change_rate\nsample2 = df_uni[which(df_uni$AD_status == 0),]$nWBV_change_rate\nt.test.result = t.test(sample1, sample2)\nprint(paste0(\"T-statistic value: \", round(t.test.result$statistic, 3)))  \n\n\n[1] \"T-statistic value: -2.585\"\n\n\nCode\nprint(paste0(\"P-Value: \", round(t.test.result$p.value, 3)))\n\n\n[1] \"P-Value: 0.011\""
+  }
+]
